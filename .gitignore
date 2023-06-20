@@ -1,0 +1,9 @@
+# Local
+dist/
+.env
+
+# Ignore JetBrains IDE settings
+.idea/
+
+# Ignore node modules directory
+node_modules/
