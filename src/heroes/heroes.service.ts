@@ -10,14 +10,15 @@ interface Hero {
 
 @Injectable()
 export class HeroesService {
-  private readonly apiUrl = 'https://hahow-recruit.herokuapp.com/heroes';
+  private readonly hahowHeroesAPIUrl: string =
+    'https://hahow-recruit.herokuapp.com/heroes';
 
   constructor(private readonly httpService: HttpService) {}
 
   async getAllHeroes(): Promise<{ heroes: Hero[] }> {
     try {
       const { data } = await firstValueFrom(
-        this.httpService.get<Hero[]>(this.apiUrl),
+        this.httpService.get<Hero[]>(this.hahowHeroesAPIUrl),
       );
       return { heroes: data };
     } catch (err) {
