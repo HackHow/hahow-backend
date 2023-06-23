@@ -83,4 +83,18 @@ export class HeroesService {
     }
     return { heroes: result };
   }
+
+  async getHeroWithProfilesById(heroId: string): Promise<HeroWithProfile> {
+    const hero = await this.getHeroById(heroId);
+    const hahowHeroProfileAPIUrl = `${this.hahowHeroesAPIUrl}/${heroId}/profile`;
+    try {
+      const { data } = await firstValueFrom(
+        this.httpService.get(hahowHeroProfileAPIUrl),
+      );
+      return { ...hero, profile: data };
+    } catch (err) {
+      console.error('getHeroWithProfilesById Service:', err.message);
+      throw err;
+    }
+  }
 }

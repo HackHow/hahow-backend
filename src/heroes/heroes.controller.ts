@@ -33,8 +33,15 @@ export class HeroesController {
   }
 
   @Get(':heroId')
-  async getHeroById(@Param('heroId') heroId: string): Promise<Hero> {
+  @UseGuards(AuthGuard)
+  async getHeroById(
+    @Req() req: Request,
+    @Param('heroId') heroId: string,
+  ): Promise<Hero> {
     try {
+      if (req.isAuthorized) {
+        return await this.heroesService.getHeroWithProfilesById(heroId);
+      }
       return await this.heroesService.getHeroById(heroId);
     } catch (err) {
       if (err instanceof HttpException) {
