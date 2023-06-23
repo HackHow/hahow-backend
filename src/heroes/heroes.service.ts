@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
+import { ConfigService } from '@nestjs/config';
 
 interface Hero {
   readonly id: string;
@@ -27,10 +28,14 @@ interface BackendErrorResponse {
 
 @Injectable()
 export class HeroesService {
-  private readonly hahowHeroesAPIUrl: string =
-    'https://hahow-recruit.herokuapp.com/heroes';
+  private readonly hahowHeroesAPIUrl: string;
 
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
+  ) {
+    this.hahowHeroesAPIUrl = configService.get<string>('HAHOW_HEROES_API_URL');
+  }
 
   async getAllHeroes(): Promise<{ heroes: Hero[] }> {
     try {
