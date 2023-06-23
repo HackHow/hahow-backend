@@ -1,4 +1,10 @@
-import { Controller, Get, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+} from '@nestjs/common';
 import { HeroesService } from './heroes.service';
 import { Hero } from './interfaces/heroes.interface';
 
@@ -10,6 +16,18 @@ export class HeroesController {
   async getAllHeroes(): Promise<{ heroes: Hero[] }> {
     try {
       return await this.heroesService.getAllHeroes();
+    } catch (err) {
+      throw new HttpException(
+        'Unexpected error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get(':heroId')
+  async getHeroById(@Param('heroId') heroId: string): Promise<Hero> {
+    try {
+      return await this.heroesService.getHeroById(heroId);
     } catch (err) {
       throw new HttpException(
         'Unexpected error',

@@ -26,4 +26,18 @@ export class HeroesService {
       throw new HttpException(err.response.data, err.response.status);
     }
   }
+
+  async getHeroById(heroId: string): Promise<Hero> {
+    try {
+      const hahowHeroAPIUrl = `${this.hahowHeroesAPIUrl}/${heroId}`;
+      const { data } = await firstValueFrom(
+        this.httpService.get<Hero>(hahowHeroAPIUrl),
+      );
+
+      return data;
+    } catch (err) {
+      console.error('getHeroById Service:', err.message);
+      throw err;
+    }
+  }
 }
