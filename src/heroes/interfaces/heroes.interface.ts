@@ -1,5 +1,5 @@
 export interface Hero {
-  readonly id: number;
+  readonly id: string;
   readonly name: string;
-  readonly image: number;
+  readonly image: string;
 }
