@@ -21,6 +21,10 @@ export interface HeroWithProfile {
   };
 }
 
+export type AllHeroes = {
+  readonly heroes: (HeroWithProfile | Hero)[];
+};
+
 interface BackendErrorResponse {
   code: number;
   message: string;
@@ -37,7 +41,7 @@ export class HeroesService {
     this.hahowHeroesAPIUrl = configService.get<string>('HAHOW_HEROES_API_URL');
   }
 
-  async getAllHeroes(): Promise<{ heroes: Hero[] }> {
+  async getAllHeroes(): Promise<AllHeroes> {
     try {
       const { data } = await firstValueFrom(
         this.httpService.get<Hero[]>(this.hahowHeroesAPIUrl),
@@ -68,7 +72,7 @@ export class HeroesService {
     }
   }
 
-  async getAllHeroesWithProfiles(): Promise<{ heroes: HeroWithProfile[] }> {
+  async getAllHeroesWithProfiles(): Promise<AllHeroes> {
     const { heroes } = await this.getAllHeroes();
     const heroesCount = heroes.length;
     const result: HeroWithProfile[] = [];
