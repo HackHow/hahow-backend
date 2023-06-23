@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
+import { ConfigService } from '@nestjs/config';
 
 interface Hero {
   readonly id: string;
@@ -20,6 +21,10 @@ export interface HeroWithProfile {
   };
 }
 
+export type AllHeroes = {
+  readonly heroes: (HeroWithProfile | Hero)[];
+};
+
 interface BackendErrorResponse {
   code: number;
   message: string;
@@ -27,12 +32,16 @@ interface BackendErrorResponse {
 
 @Injectable()
 export class HeroesService {
-  private readonly hahowHeroesAPIUrl: string =
-    'https://hahow-recruit.herokuapp.com/heroes';
+  private readonly hahowHeroesAPIUrl: string;
 
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
+  ) {
+    this.hahowHeroesAPIUrl = configService.get<string>('HAHOW_HEROES_API_URL');
+  }
 
-  async getAllHeroes(): Promise<{ heroes: Hero[] }> {
+  async getAllHeroes(): Promise<AllHeroes> {
     try {
       const { data } = await firstValueFrom(
         this.httpService.get<Hero[]>(this.hahowHeroesAPIUrl),
@@ -44,7 +53,7 @@ export class HeroesService {
     }
   }
 
-  async getHeroById(heroId: string): Promise<Hero> {
+  async getHeroById(heroId: number): Promise<Hero> {
     try {
       const hahowHeroAPIUrl = `${this.hahowHeroesAPIUrl}/${heroId}`;
       const { data } = await firstValueFrom(
@@ -63,7 +72,7 @@ export class HeroesService {
     }
   }
 
-  async getAllHeroesWithProfiles(): Promise<{ heroes: HeroWithProfile[] }> {
+  async getAllHeroesWithProfiles(): Promise<AllHeroes> {
     const { heroes } = await this.getAllHeroes();
     const heroesCount = heroes.length;
     const result: HeroWithProfile[] = [];
@@ -84,7 +93,7 @@ export class HeroesService {
     return { heroes: result };
   }
 
-  async getHeroWithProfilesById(heroId: string): Promise<HeroWithProfile> {
+  async getHeroWithProfilesById(heroId: number): Promise<HeroWithProfile> {
     const hero = await this.getHeroById(heroId);
     const hahowHeroProfileAPIUrl = `${this.hahowHeroesAPIUrl}/${heroId}/profile`;
     try {
