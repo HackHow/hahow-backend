@@ -4,17 +4,25 @@ import {
   HttpException,
   HttpStatus,
   Param,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { HeroesService } from './heroes.service';
-import { Hero } from './interfaces/heroes.interface';
+import { AllHeroes, Hero } from './interfaces/heroes.interface';
+import { AuthGuard } from '../guards/auth.guard';
+import { Request } from 'express';
 
 @Controller('heroes')
 export class HeroesController {
   constructor(private readonly heroesService: HeroesService) {}
 
   @Get()
-  async getAllHeroes(): Promise<{ heroes: Hero[] }> {
+  @UseGuards(AuthGuard)
+  async getAllHeroes(@Req() req: Request): Promise<AllHeroes> {
     try {
+      if (req.isAuthorized) {
+        return await this.heroesService.getAllHeroesWithProfiles();
+      }
       return await this.heroesService.getAllHeroes();
     } catch (err) {
       throw new HttpException(
