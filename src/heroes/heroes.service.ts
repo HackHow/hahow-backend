@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 
@@ -6,6 +6,11 @@ interface Hero {
   readonly id: number;
   readonly name: string;
   readonly image: number;
+}
+
+interface BackendErrorResponse {
+  code: number;
+  message: string;
 }
 
 @Injectable()
@@ -31,10 +36,15 @@ export class HeroesService {
     try {
       const hahowHeroAPIUrl = `${this.hahowHeroesAPIUrl}/${heroId}`;
       const { data } = await firstValueFrom(
-        this.httpService.get<Hero>(hahowHeroAPIUrl),
+        this.httpService.get<Hero | BackendErrorResponse>(hahowHeroAPIUrl),
       );
 
-      return data;
+      // When status code == 200, but did not get the data, need to return the message
+      if ('code' in data) {
+        throw new HttpException('Try it again', HttpStatus.OK);
+      }
+
+      return <Hero>data;
     } catch (err) {
       console.error('getHeroById Service:', err.message);
       throw err;

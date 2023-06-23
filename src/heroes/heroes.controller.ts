@@ -29,10 +29,14 @@ export class HeroesController {
     try {
       return await this.heroesService.getHeroById(heroId);
     } catch (err) {
-      throw new HttpException(
-        'Unexpected error',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      if (err instanceof HttpException) {
+        throw new HttpException(err.getResponse(), err.getStatus());
+      } else {
+        throw new HttpException(
+          'Unexpected error',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
     }
   }
 }
