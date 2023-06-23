@@ -49,7 +49,7 @@ export class HeroesService {
     }
   }
 
-  async getHeroById(heroId: string): Promise<Hero> {
+  async getHeroById(heroId: number): Promise<Hero> {
     try {
       const hahowHeroAPIUrl = `${this.hahowHeroesAPIUrl}/${heroId}`;
       const { data } = await firstValueFrom(
@@ -89,7 +89,7 @@ export class HeroesService {
     return { heroes: result };
   }
 
-  async getHeroWithProfilesById(heroId: string): Promise<HeroWithProfile> {
+  async getHeroWithProfilesById(heroId: number): Promise<HeroWithProfile> {
     const hero = await this.getHeroById(heroId);
     const hahowHeroProfileAPIUrl = `${this.hahowHeroesAPIUrl}/${heroId}/profile`;
     try {

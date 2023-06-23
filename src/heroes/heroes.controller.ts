@@ -36,7 +36,7 @@ export class HeroesController {
   @UseGuards(AuthGuard)
   async getHeroById(
     @Req() req: Request,
-    @Param('heroId') heroId: string,
+    @Param('heroId') heroId: number,
   ): Promise<Hero> {
     try {
       if (req.isAuthorized) {
