@@ -18,7 +18,7 @@ export class HeroesController {
 
   @Get()
   @UseGuards(AuthGuard)
-  async getAllHeroes(@Req() req: Request): Promise<AllHeroes> {
+  async getHeroesWithOptionalProfiles(@Req() req: Request): Promise<AllHeroes> {
     try {
       if (req.isAuthorized) {
         return await this.heroesService.getAllHeroesWithProfiles();
@@ -34,7 +34,7 @@ export class HeroesController {
 
   @Get(':heroId')
   @UseGuards(AuthGuard)
-  async getHeroById(
+  async getHeroByIdWithOptionalProfiles(
     @Req() req: Request,
     @Param('heroId') heroId: number,
   ): Promise<Hero> {
