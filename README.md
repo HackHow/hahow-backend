@@ -1,12 +1,16 @@
-# [Hahow Backend Engineer interview project](https://github.com/hahow/hahow-recruit/blob/master/backend.md)
+# [Hahow Backend Engineer Interview Project](https://github.com/hahow/hahow-recruit/blob/master/backend.md)
 
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+  <a href="https://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
 
 <p align="center">
-  This is a backend project developed using <a href="https://github.com/nestjs/nest">Nest.js</a>
-  and <a href="https://www.typescriptlang.org/">TypeScript</a>, which offers users an API to retrieve <b>Heroes data</b>
+  This is a <a href="https://github.com/nestjs/nest">Nest.js</a>
+  and <a href="https://www.typescriptlang.org/">TypeScript</a> backend project that provides an API for accessing <b>Heroes data</b>. 
+</p>
+
+<p align="center">
+  The development process of this project follows the <a href="https://trunkbaseddevelopment.com/">TBD Flow</a> methodology.
 </p>
 
 ## Contents
@@ -15,7 +19,7 @@
 
 - [Installation](#installation)
 
-- [Running the Appliaction](#running-the-application)
+- [Running the Application](#running-the-application)
 
 - [Architecture Diagram](#architecture-diagram)
 
@@ -31,9 +35,9 @@
 
 ## Getting Started
 
-1. Install [Node.js]() (recommend using the LTS version)
+1. Install [Node.js](https://nodejs.org/en) (recommend using the LTS version)
 2. Install a code editor: [WebStorm](https://www.jetbrains.com/webstorm/download/#section=mac)
-   or [Visual Studio Code](https://code.visualstudio.com/downloa)
+   or [Visual Studio Code](https://code.visualstudio.com/)
 3. Install API testing tool: [Postman](https://www.postman.com/downloads/) or [Insomnia](https://insomnia.rest/download)
 
 ## Installation
@@ -95,78 +99,79 @@ $ npm run test
 
 ![Hahow Programming Flow Chart](https://github.com/HackHow/hahow-backend/assets/56557271/d7d2702c-3b96-4985-a984-7ad1f240bf01)
 
-**Controllers**: Handle HTTP requests and responses to the client, returning data about Heroes or a specific Hero.
+- **Controllers**: Handle HTTP requests and responses to the client, returning data about Heroes or a specific Hero.
 
-**Providers**: Offer services that provide data about Heroes or a specific Hero. This data is sourced from the responses
-obtained by making requests to the Hahow API.
+- **Providers**: Offer services that provide data about Heroes or a specific Hero. This data is sourced from the
+  responses
+  obtained by making requests to the Hahow API.
 
-**Modules**: The Heroes module is injected into the AppModule using dependency injection, a primary method by which
-Nest.js organizes the structure of the application.
+- **Modules**: The Heroes module is injected into the AppModule using dependency injection, a primary method by which
+  Nest.js organizes the structure of the application.
 
-**Guard**: Acts as a layer used for handling authentication. It ensures that incoming requests have the required
-permissions to access data about Heroes or a specific Hero that includes Profile information.
+- **Guard**: Acts as a layer used for handling authentication. It ensures that incoming requests have the required
+  permissions to access data about Heroes or a specific Hero that includes Profile information.
 
 ## API Workflow Diagrams
 
-**List Heroes and Authenticated List Heroes Endpoints**: The following diagram illustrates the workflow for
-the `GET /heroes` and the authenticated version of the same endpoint.
+- **List Heroes and Authenticated List Heroes Endpoints**: The following diagram illustrates the workflow for
+  the `GET /heroes` and the authenticated version of the same endpoint.
 
-```mermaid
-sequenceDiagram
-    Client ->>+ Guard: Get: http://localhost:3000/heroes
-    Note over Guard, Hahow Auth API: Identity Verification Success
-    Guard ->>+ Hahow Auth API: header: {"name": "hahow","password": "rocks"}
-    Hahow Auth API ->>+ Guard: OK
-    Guard ->>+ Heroes Controller: isAuthorized == true
-    Heroes Controller ->>+ Heroes Service: Call getAllHeroesWithProfiles()
-    Heroes Service ->>+ Hahow Heroes API: Request
-    Hahow Heroes API ->>+ Heroes Service: Heroes Data
-    loop Given Hero ID
+    ```mermaid
+    sequenceDiagram
+        Client ->>+ Guard: Get: http://localhost:3000/heroes
+        Note over Guard, Hahow Auth API: Identity Verification Success
+        Guard ->>+ Hahow Auth API: header: {"name": "hahow","password": "rocks"}
+        Hahow Auth API ->>+ Guard: OK
+        Guard ->>+ Heroes Controller: isAuthorized == true
+        Heroes Controller ->>+ Heroes Service: Call getAllHeroesWithProfiles()
+        Heroes Service ->>+ Hahow Heroes API: Request
+        Hahow Heroes API ->>+ Heroes Service: Heroes Data
+        loop Given Hero ID
+            Heroes Service ->>+ Hahow Hero Profile API: Request
+            Hahow Hero Profile API ->>+ Heroes Service: Profile Data
+        end
+        Heroes Service ->>+ Heroes Controller: Heroes Data with Profile
+        Heroes Controller ->>+ Client: Repsonse (Data)
+    
+        Note over Guard, Hahow Auth API: Identity Verification Fail
+        Guard ->>+ Hahow Auth API: header: {"show": "me the secret"}
+        Hahow Auth API ->>+ Guard: Bad Request
+        Guard ->>+ Heroes Controller: isAuthorized == false
+        Heroes Controller ->>+ Heroes Service: getAllHeroes()
+        Heroes Service ->>+ Hahow Heroes API: Request
+        Hahow Heroes API ->>+ Heroes Service: Heroes Data
+        Heroes Service ->>+ Heroes Controller: Heroes Data
+        Heroes Controller ->>+ Client: Response (Data)
+    ```
+
+- **Single Hero and Authenticated Single Hero Endpoints**: The following diagram illustrates the workflow for
+  the `GET /heroes/:heroId` and the authenticated version of the same endpoint.
+
+    ```mermaid
+    sequenceDiagram
+        Client ->>+ Guard: Get: http://localhost:3000/heroes/:heroId
+        Note over Guard, Hahow Auth API: Identity Verification Success
+        Guard ->>+ Hahow Auth API: header: {"name": "hahow","password": "rocks"}
+        Hahow Auth API ->>+ Guard: OK
+        Guard ->>+ Heroes Controller: isAuthorized == true
+        Heroes Controller ->>+ Heroes Service: Call getHeroWithProfilesById(heroId)
+        Heroes Service ->>+ Hahow Heroes API: Request
+        Hahow Heroes API ->>+ Heroes Service: Hero Data
         Heroes Service ->>+ Hahow Hero Profile API: Request
         Hahow Hero Profile API ->>+ Heroes Service: Profile Data
-    end
-    Heroes Service ->>+ Heroes Controller: Heroes Data with Profile
-    Heroes Controller ->>+ Client: Repsonse (Data)
-
-    Note over Guard, Hahow Auth API: Identity Verification Fail
-    Guard ->>+ Hahow Auth API: header: {"show": "me the secret"}
-    Hahow Auth API ->>+ Guard: Bad Request
-    Guard ->>+ Heroes Controller: isAuthorized == false
-    Heroes Controller ->>+ Heroes Service: getAllHeroes()
-    Heroes Service ->>+ Hahow Heroes API: Request
-    Hahow Heroes API ->>+ Heroes Service: Heroes Data
-    Heroes Service ->>+ Heroes Controller: Heroes Data
-    Heroes Controller ->>+ Client: Response (Data)
-```
-
-**Single Hero and Authenticated Single Hero Endpoints**: The following diagram illustrates the workflow for
-the `GET /heroes/:heroId` and the authenticated version of the same endpoint.
-
-```mermaid
-sequenceDiagram
-    Client ->>+ Guard: Get: http://localhost:3000/heroes/:heroId
-    Note over Guard, Hahow Auth API: Identity Verification Success
-    Guard ->>+ Hahow Auth API: header: {"name": "hahow","password": "rocks"}
-    Hahow Auth API ->>+ Guard: OK
-    Guard ->>+ Heroes Controller: isAuthorized == true
-    Heroes Controller ->>+ Heroes Service: Call getHeroWithProfilesById(heroId)
-    Heroes Service ->>+ Hahow Heroes API: Request
-    Hahow Heroes API ->>+ Heroes Service: Hero Data
-    Heroes Service ->>+ Hahow Hero Profile API: Request
-    Hahow Hero Profile API ->>+ Heroes Service: Profile Data
-    Heroes Service ->>+ Heroes Controller: Hero Data with Profile
-    Heroes Controller ->>+ Client: Repsonse (Data)
-
-    Note over Guard, Hahow Auth API: Identity Verification Fail
-    Guard ->>+ Hahow Auth API: header: {"show": "me the secret"}
-    Hahow Auth API ->>+ Guard: Bad Request
-    Guard ->>+ Heroes Controller: isAuthorized == false
-    Heroes Controller ->>+ Heroes Service: getHeroById(heroId)
-    Heroes Service ->>+ Hahow Heroes API: Request
-    Hahow Heroes API ->>+ Heroes Service: Hero Data
-    Heroes Service ->>+ Heroes Controller: Hero Data
-    Heroes Controller ->>+ Client: Response (Data)
-```
+        Heroes Service ->>+ Heroes Controller: Hero Data with Profile
+        Heroes Controller ->>+ Client: Repsonse (Data)
+    
+        Note over Guard, Hahow Auth API: Identity Verification Fail
+        Guard ->>+ Hahow Auth API: header: {"show": "me the secret"}
+        Hahow Auth API ->>+ Guard: Bad Request
+        Guard ->>+ Heroes Controller: isAuthorized == false
+        Heroes Controller ->>+ Heroes Service: getHeroById(heroId)
+        Heroes Service ->>+ Hahow Heroes API: Request
+        Hahow Heroes API ->>+ Heroes Service: Hero Data
+        Heroes Service ->>+ Heroes Controller: Hero Data
+        Heroes Controller ->>+ Client: Response (Data)
+    ```
 
 ## Code Comments Principles
 
@@ -251,3 +256,5 @@ than what it's doing. This will help future contributors better understand the i
 [IT help Articles](https://ithelp.ithome.com.tw/users/20119338/ironman/3880)
 
 [The Ultimate Guide (2023)](https://masteringbackend.com/posts/nestjs-typescrpt-ultimate-guide#nestjs-the-framework)
+
+[Trunk Based Development](https://trunkbaseddevelopment.com/)
