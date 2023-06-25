@@ -89,11 +89,11 @@ $ npm run test
 
 #### Here is a demonstration of testing the API endpoints using [Insomnia](https://insomnia.rest/download):
 
-![API test with Insomnia](..%2F%E6%88%AA%E5%9C%96%202023-06-25%20%E4%B8%8B%E5%8D%885.13.54.png)
+<img width="1278" alt="截圖 2023-06-25 下午5 13 54" src="https://github.com/HackHow/hahow-backend/assets/56557271/f680a8db-25c6-4763-a3e2-2dc890efcab7">
 
 ## Architecture Diagram
 
-![Hahow Programming Flow Chart.jpg](..%2F..%2FDownloads%2FHahow%20Programming%20Flow%20Chart.jpg)
+![Hahow Programming Flow Chart](https://github.com/HackHow/hahow-backend/assets/56557271/d7d2702c-3b96-4985-a984-7ad1f240bf01)
 
 **Controllers**: Handle HTTP requests and responses to the client, returning data about Heroes or a specific Hero.
 
