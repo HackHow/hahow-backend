@@ -4,11 +4,10 @@ import { HeroesService } from './heroes.service';
 import { AuthGuard } from '../guards/auth.guard';
 import { Request } from 'express';
 import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
 
 describe('HeroesController', () => {
   let controller: HeroesController;
-  let heroesService: HeroesService;
-  let authGuard: AuthGuard;
 
   const mockHeroesService = {
     getAllHeroes: jest.fn().mockResolvedValue({
@@ -75,6 +74,10 @@ describe('HeroesController', () => {
     post: jest.fn().mockResolvedValue({ data: {} }),
   };
 
+  const mockConfigService = {
+    get: jest.fn().mockReturnValue('https://example.com'),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [HeroesController],
@@ -82,12 +85,11 @@ describe('HeroesController', () => {
         { provide: HeroesService, useValue: mockHeroesService },
         { provide: AuthGuard, useValue: mockAuthGuard },
         { provide: HttpService, useValue: mockHttpService },
+        { provide: ConfigService, useValue: mockConfigService },
       ],
     }).compile();
 
     controller = module.get<HeroesController>(HeroesController);
-    heroesService = module.get<HeroesService>(HeroesService);
-    authGuard = module.get<AuthGuard>(AuthGuard);
   });
 
   it('should be defined', () => {
@@ -96,7 +98,7 @@ describe('HeroesController', () => {
 
   it('should get all heroes', async () => {
     const req = { isAuthorized: false } as Request;
-    expect(await controller.getAllHeroes(req)).toEqual({
+    expect(await controller.getHeroesWithOptionalProfiles(req)).toEqual({
       heroes: [
         {
           id: 1,
@@ -115,7 +117,7 @@ describe('HeroesController', () => {
 
   it('should get all heroes with profiles', async () => {
     const req = { isAuthorized: true } as Request;
-    expect(await controller.getAllHeroes(req)).toEqual({
+    expect(await controller.getHeroesWithOptionalProfiles(req)).toEqual({
       heroes: [
         {
           id: 1,
@@ -147,7 +149,9 @@ describe('HeroesController', () => {
   it('should get hero with profile by id', async () => {
     const req = { isAuthorized: true } as Request;
     const mockHeroId = 1;
-    expect(await controller.getHeroById(req, mockHeroId)).toEqual({
+    expect(
+      await controller.getHeroByIdWithOptionalProfiles(req, mockHeroId),
+    ).toEqual({
       id: 1,
       name: 'Iron Man',
       image: 'ironman.png',
@@ -166,7 +170,9 @@ describe('HeroesController', () => {
   it('should get hero by id', async () => {
     const mockReq = { isAuthorized: false } as Request;
     const mockHeroId = 1;
-    expect(await controller.getHeroById(mockReq, mockHeroId)).toEqual({
+    expect(
+      await controller.getHeroByIdWithOptionalProfiles(mockReq, mockHeroId),
+    ).toEqual({
       id: 1,
       name: 'Iron Man',
       image: 'ironman.png',
@@ -181,7 +187,9 @@ describe('HeroesController', () => {
       code: 1000,
       message: 'backend error',
     });
-    expect(await controller.getHeroById(mockReq, mockHeroId)).toEqual({
+    expect(
+      await controller.getHeroByIdWithOptionalProfiles(mockReq, mockHeroId),
+    ).toEqual({
       code: 1000,
       message: 'backend error',
     });
@@ -196,7 +204,9 @@ describe('HeroesController', () => {
       statusCode: 500,
       message: 'Unexpected error',
     });
-    expect(await controller.getHeroById(mockReq, mockHeroId)).toEqual({
+    expect(
+      await controller.getHeroByIdWithOptionalProfiles(mockReq, mockHeroId),
+    ).toEqual({
       statusCode: 500,
       message: 'Unexpected error',
     });
