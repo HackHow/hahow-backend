@@ -7,7 +7,3 @@ dist/
 
 # Ignore node modules directory
 node_modules/
-
-# Ignore files that have not been tested
-src/heroes/heroes.service.spec.ts
-src/guards/auth.guard.spec.ts
